@@ -1,25 +1,25 @@
 <?php
 class User {
     private $conn;
-    private $table = 'posts';
+    private $table = 'user';
 
     public $id;
-    public $title;
-    public $body;
+    public $username;
+    public $password;
 
     public function __construct($db) {
         $this->conn = $db;
     }
 
     public function read() {
-        $query = 'SELECT id, title, body FROM ' . $this->table;
+        $query = 'SELECT * FROM ' . $this->table;
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
         return $stmt;
     }
     
     public function readSingle() {
-        $query = 'SELECT id, title, body FROM ' . $this->table . 'WHERE id = :id';
+        $query = 'SELECT * FROM ' . $this->table . 'WHERE id = :id';
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':id', $this->id);
         $stmt->execute();
@@ -27,11 +27,12 @@ class User {
     }
 
     public function create() {
-        $query = 'INSERT INTO ' . $this->table . ' SET title = :title, body = :body';
+        // SYNTAX ERROR FOR QUERY
+        $query = 'INSERT INTO ' . $this->table . '(username, password) VALUE (username = :username, password = :password)';
         $stmt = $this->conn->prepare($query);
         
-        $stmt->bindParam(':title', $this->title);
-        $stmt->bindParam(':body', $this->body);
+        $stmt->bindParam(':username', $this->username);
+        $stmt->bindParam(':password', $this->password);
 
         if ($stmt->execute()) {
             return true;
@@ -41,11 +42,11 @@ class User {
     }
 
     public function update() {
-        $query = 'UPDATE ' . $this->table . ' SET title = :title, body = :body WHERE id = :id';
+        $query = 'UPDATE ' . $this->table . ' SET username = :username, password = :password WHERE id = :id';
         $stmt = $this->conn->prepare($query);
         
-        $stmt->bindParam(':title', $this->title);
-        $stmt->bindParam(':body', $this->body);
+        $stmt->bindParam(':username', $this->username);
+        $stmt->bindParam(':password', $this->password);
         $stmt->bindParam(':id', $this->id);
 
         if ($stmt->execute()) {

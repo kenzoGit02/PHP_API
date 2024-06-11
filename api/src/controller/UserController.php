@@ -1,40 +1,39 @@
 <?php
 // api/controllers/PostController.php
-// require_once '../model/User.php';
+// require_once 'D:\xampp\htdocs\MVC_API\api\src\model\User.php';
+require_once __DIR__ . '/../model/User.php';
 class UserController {
-    
-    
+
     private $db;
     private $requestMethod;
-    private $postId;
+    private $userId;
+    private $user;
 
-    private $post;
-
-    public function __construct($db, $requestMethod, $postId) {
+    public function __construct($db, $requestMethod, $userId) {
         $this->db = $db;
         $this->requestMethod = $requestMethod;
-        $this->postId = $postId;
+        $this->userId = $userId;
 
-        $this->post = new User($db);
+        $this->user = new User($db);
     }
 
     public function processRequest() {
         switch ($this->requestMethod) {
             case 'GET':
-                if ($this->postId) {
-                    $response = $this->getPost($this->postId);
+                if ($this->userId) {
+                    $response = $this->getUser($this->userId);
                 } else {
-                    $response = $this->getAllPosts();
+                    $response = $this->getAllUsers();
                 }
                 break;
             case 'POST':
-                $response = $this->createPost();
+                $response = $this->createUser();
                 break;
             case 'PUT':
-                $response = $this->updatePost($this->postId);
+                $response = $this->updateUser($this->userId);
                 break;
             case 'DELETE':
-                $response = $this->deletePost($this->postId);
+                $response = $this->deleteUser($this->userId);
                 break;
             default:
                 $response = $this->notFoundResponse();
@@ -46,67 +45,67 @@ class UserController {
         }
     }
 
-    private function getAllPosts() {
-        $result = $this->post->read();
-        $posts = $result->fetchAll(PDO::FETCH_ASSOC);
-        return $this->okResponse($posts);
+    private function getAllUsers() {
+        $result = $this->user->read();
+        $users = $result->fetchAll(PDO::FETCH_ASSOC);
+        return $this->okResponse($users);
         // echo json_encode($this->okResponse($posts));
     }
 
-    private function getPost($id) {
-        $this->post->id = $id;
-        $result = $this->post->readSingle();
+    private function getUser($id) {
+        $this->user->id = $id;
+        $result = $this->user->readSingle();
         if (!$result) {
             return $this->notFoundResponse();
         }
         return $this->okResponse($result);
     }
 
-    private function createPost() {
+    private function createUser() {
         $input = (array) json_decode(file_get_contents('php://input'), true);
-        if (!$this->validatePost($input)) {
+        if (!$this->validateUser($input)) {
             return $this->unprocessableEntityResponse();
         }
 
-        $this->post->title = $input['title'];
-        $this->post->body = $input['body'];
+        $this->user->username = $input['username'];
+        $this->user->password = $input['password'];
 
-        if ($this->post->create()) {
+        if ($this->user->create()) {
             return $this->createdResponse();
         }
 
         return $this->unprocessableEntityResponse();
     }
 
-    private function updatePost($id) {
+    private function updateUser($id) {
         $input = (array) json_decode(file_get_contents('php://input'), true);
-        if (!$this->validatePost($input)) {
+        if (!$this->validateUser($input)) {
             return $this->unprocessableEntityResponse();
         }
 
-        $this->post->id = $id;
-        $this->post->title = $input['title'];
-        $this->post->body = $input['body'];
+        $this->user->id = $id;
+        $this->user->username = $input['username'];
+        $this->user->password = $input['password'];
 
-        if ($this->post->update()) {
+        if ($this->user->update()) {
             return $this->okResponse(null);
         }
 
         return $this->unprocessableEntityResponse();
     }
 
-    private function deletePost($id) {
-        $this->post->id = $id;
+    private function deleteUser($id) {
+        $this->user->id = $id;
 
-        if ($this->post->delete()) {
+        if ($this->user->delete()) {
             return $this->okResponse(null);
         }
 
         return $this->unprocessableEntityResponse();
     }
 
-    private function validatePost($input) {
-        return isset($input['title']) && isset($input['body']);
+    private function validateUser($input) {
+        return isset($input['username']) && isset($input['password']);
     }
 
     private function okResponse($data) {

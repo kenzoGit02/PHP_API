@@ -7,6 +7,7 @@ class UserController {
     private $db;
     private $requestMethod;
     private $userId;
+    
     private $user;
 
     public function __construct($db, $requestMethod, $userId) {

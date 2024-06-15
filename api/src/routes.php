@@ -2,6 +2,7 @@
 // api/routes.php
 
 $routes = [
-    'user' => ['UserController.php', 'verbs' => ['index','show','post', 'put', 'delete']],
+    'user' => ['UserController'],
+    'auth' => ['AuthController'],
     // Add more routes here
 ];

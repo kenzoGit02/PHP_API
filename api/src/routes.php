@@ -3,6 +3,7 @@
 
 $routes = [
     'user' => ['UserController'],
-    'auth' => ['AuthController'],
+    'login' => ['LoginController'],
+    'signup' => ['SignUpController'],
     // Add more routes here
 ];

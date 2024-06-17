@@ -57,6 +57,6 @@ $pdo = new Database();
 
 $test = new $Controller($pdo, $requestMethod, $requestQueryArray);
 
-$test->test();
+$test->processRequest();
 
 exit;

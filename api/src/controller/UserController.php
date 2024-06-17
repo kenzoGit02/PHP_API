@@ -10,10 +10,10 @@ class UserController {
     
     private $user;
 
-    public function __construct($db, $requestMethod, $userId) {
+    public function __construct($db, $requestMethod, $requestQueryArray) {
         $this->db = $db;
         $this->requestMethod = $requestMethod;
-        $this->userId = $userId;
+        $this->userId = $requestQueryArray;
 
         $this->user = new User($db);
     }
@@ -21,11 +21,11 @@ class UserController {
     public function processRequest() {
         switch ($this->requestMethod) {
             case 'GET':
-                if ($this->userId) {
-                    $response = $this->getUser($this->userId);
-                } else {
+                // if ($this->userId) {
+                //     $response = $this->getUser($this->userId);
+                // } else {
                     $response = $this->getAllUsers();
-                }
+                // }
                 break;
             case 'POST':
                 $response = $this->createUser();
@@ -47,6 +47,7 @@ class UserController {
     }
 
     private function getAllUsers() {
+        
         $result = $this->user->read();
         $users = $result->fetchAll(PDO::FETCH_ASSOC);
         return $this->okResponse($users);

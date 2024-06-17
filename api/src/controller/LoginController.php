@@ -9,9 +9,9 @@ class LoginController{
     private $auth;
     public function __construct($db ,$requestMethod, $requestQueryArray)
     {
+        $this->db = $db;
         $this->requestMethod = $requestMethod;
         $this->queryArray = $requestQueryArray;
-        $this->db = $db;
         
         $this->auth = new Auth($db);
 

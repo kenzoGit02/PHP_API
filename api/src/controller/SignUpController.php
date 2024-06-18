@@ -6,16 +6,16 @@ use Firebase\JWT\JWT;
 class SignUpController{
 
     private $requestMethod;
-    private $queryArray;
     private $db;
     private $key = "CI6IkpXVCJ9";
     private $SignUp;
+    private $extraArgument;
 
-    public function __construct($db ,$requestMethod, $requestQueryArray)
+    public function __construct($db ,$requestMethod, ...$extraArgument)
     {
         $this->db = $db->connect();
         $this->requestMethod = $requestMethod;
-        $this->queryArray = $requestQueryArray;
+        $this->extraArgument = $extraArgument;
         
         $this->SignUp = new SignUp($db);
 
@@ -25,12 +25,14 @@ class SignUpController{
         if ($this->requestMethod) {
             // echo json_encode($this->queryArray["id"]);
             echo $this->requestMethod;
+            echo json_encode([$this->extraArgument, $this->SignUp->testFunction()]);
             exit;
         }else{
             echo json_encode("No ID");
             exit;
         }
     }
+
     public function ProcessRequest(){
         switch ($this->requestMethod) {
             case 'POST':
@@ -59,11 +61,16 @@ class SignUpController{
         $this->SignUp->password = $data['password'];
 
         $signup = $this->SignUp->create();
-        
+
+        if (!$signup){
+            return $this->createErrorResponse();
+        }
+
         $JWTToken = $this->generateJWTToken($signup);
 
         return $this->createdResponse($JWTToken);
     }
+
     private function generateJWTToken($id): string
     {
         $payload = [
@@ -77,22 +84,25 @@ class SignUpController{
 
         return $encode;
     }
+
     private function validateInput($input): bool 
     {
         return isset($input['username']) && isset($input['password']);
-    }
-
-    private function okResponse($data): array
-    {
-        $response['status_code_header'] = 'HTTP/1.1 200 OK';
-        $response['body'] = json_encode($data);
-        return $response;
     }
 
     private function createdResponse($data): array
     {
         $response['status_code_header'] = 'HTTP/1.1 201 Created';
         $response['body'] = json_encode($data);
+        return $response;
+    }
+
+    private function createErrorResponse(): array
+    {
+        $response['status_code_header'] = 'HTTP/1.1 201 Created';
+        $response['body'] = json_encode([
+            'error' => 'Something went wrong while inserting to database'
+        ]);
         return $response;
     }
 

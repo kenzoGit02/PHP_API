@@ -1,15 +1,19 @@
 <?php
 require_once __DIR__ . '/../model/SignUp.php';
+require_once '../vendor/autoload.php';
 
+use Firebase\JWT\JWT;
 class SignUpController{
+
     private $requestMethod;
     private $queryArray;
     private $db;
-
+    private $key = "CI6IkpXVCJ9";
     private $SignUp;
+
     public function __construct($db ,$requestMethod, $requestQueryArray)
     {
-        $this->db = $db;
+        $this->db = $db->connect();
         $this->requestMethod = $requestMethod;
         $this->queryArray = $requestQueryArray;
         
@@ -43,7 +47,7 @@ class SignUpController{
         }
     }
 
-    private function signUp(): array
+    private function signUp()
     {
         $data = (array) json_decode(file_get_contents('php://input'), true);
 
@@ -54,11 +58,25 @@ class SignUpController{
         $this->SignUp->username = $data['username'];
         $this->SignUp->password = $data['password'];
 
-        $this->SignUp->create();
+        $signup = $this->SignUp->create();
+        
+        $JWTToken = $this->generateJWTToken($signup);
 
-        return $this->createdResponse();
+        return $this->createdResponse($JWTToken);
     }
+    private function generateJWTToken($id): string
+    {
+        $payload = [
+            'iss' => $_SERVER["SERVER_NAME"], //issuer(who created and signed this token)
+            'iat' => time(),//issued at
+            'exp' => strtotime("+1 hour"),//expiration time
+            'id' => $id
+        ];
 
+        $encode = JWT::encode($payload, $this->key, 'HS256');
+
+        return $encode;
+    }
     private function validateInput($input): bool 
     {
         return isset($input['username']) && isset($input['password']);
@@ -71,10 +89,10 @@ class SignUpController{
         return $response;
     }
 
-    private function createdResponse(): array
+    private function createdResponse($data): array
     {
         $response['status_code_header'] = 'HTTP/1.1 201 Created';
-        $response['body'] = null;
+        $response['body'] = json_encode($data);
         return $response;
     }
 

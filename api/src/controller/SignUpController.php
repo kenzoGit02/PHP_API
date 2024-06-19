@@ -10,22 +10,27 @@ class SignUpController{
     private $key = "CI6IkpXVCJ9";
     private $SignUp;
     private $extraArgument;
+    private static $staticProperty = "static propertie's value";
 
     public function __construct($db ,$requestMethod, ...$extraArgument)
     {
         $this->db = $db->connect();
         $this->requestMethod = $requestMethod;
+        // self::$staticProperty = $this->requestMethod;
         $this->extraArgument = $extraArgument;
         
         $this->SignUp = new SignUp($db);
 
+    }
+    public static function staticFunction(){
+        echo json_encode([self::$staticProperty]);
     }
     public function test(){
         // $test = $this->auth->AuthTest();
         if ($this->requestMethod) {
             // echo json_encode($this->queryArray["id"]);
             echo $this->requestMethod;
-            echo json_encode([$this->extraArgument, $this->SignUp->testFunction()]);
+            echo json_encode([$this->extraArgument, $this->SignUp->testFunction(), self::$staticProperty]);
             exit;
         }else{
             echo json_encode("No ID");

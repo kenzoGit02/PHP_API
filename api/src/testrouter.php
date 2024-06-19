@@ -60,6 +60,6 @@ $test = new $Controller($pdo, $requestMethod, $requestQueryArray);
 // echo json_encode([$pdo, $requestMethod, $requestQueryArray]);
 // return;
 // $test->processRequest();
-$test->test();
-
+// $test->test();
+$Controller::staticFunction();
 exit;

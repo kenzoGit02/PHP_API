@@ -53,7 +53,7 @@ class SignUpController{
         if(!$this->validateInput($data)){
 
             $this->unprocessableEntityResponse();
-            
+
         }
 
         $this->SignUp->username = $data['username'];

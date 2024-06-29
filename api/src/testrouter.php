@@ -2,10 +2,14 @@
 
 require_once 'routes.php';
 require_once 'config/database.php';
+require_once 'services/ErrorHandler.php';
 
 spl_autoload_register(fn($class)=> require __DIR__ . "/controller/$class.php");
 
 use api\config\Database;
+
+set_error_handler("ErrorHandler::handleError");
+set_exception_handler("ErrorHandler::handleException");
 
 $requestMethod = $_SERVER["REQUEST_METHOD"];
 

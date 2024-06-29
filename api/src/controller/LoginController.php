@@ -35,7 +35,7 @@ class LoginController{
     }
 
     public function ProcessRequest(){
-        
+
         switch ($this->requestMethod) {
             case 'POST':
                 $response = $this->loginUser();

@@ -1,55 +1,115 @@
 <?php
-require_once __DIR__ . '/../model/Auth.php';
+require_once __DIR__ . '/../model/Login.php';
+require_once '../vendor/autoload.php';
 
+use Firebase\JWT\JWT;
+use api\model\Login;
 class LoginController{
-    private $requestMethod;
-    private $queryArray;
-    private $db;
 
-    private $auth;
-    public function __construct($db ,$requestMethod, $requestQueryArray)
+    private $key = "CI6IkpXVCJ9";
+    private $extraArgument;
+    private $Login;
+
+    public function __construct(private $db ,private $requestMethod, ...$extraArgument)
     {
-        $this->db = $db;
-        $this->requestMethod = $requestMethod;
-        $this->queryArray = $requestQueryArray;
-        
-        $this->auth = new Auth($db);
-
+        $this->extraArgument = $extraArgument;
+        $this->Login = new Login($db);
     }
+
     public function test(){
-        // $test = $this->auth->AuthTest();
+
         if ($this->requestMethod) {
-            // echo json_encode($this->queryArray["id"]);
-            echo $this->requestMethod;
+
+            echo json_encode([
+                $this->requestMethod, 
+                $this->db, 
+                $this->extraArgument, 
+                $this->Login]);
+            var_dump($this->Login);
+            exit;
         }else{
+
             echo json_encode("No ID");
+            exit;
         }
     }
+
     public function ProcessRequest(){
+        
         switch ($this->requestMethod) {
-            case 'GET':
-                if ($this->queryArray["id"]) {
-                    // $response = $this->getUser($this->userId);
-                } else {
-                    // $response = $this->getAllUsers();
-                }
-                break;
             case 'POST':
-                // $response = $this->createUser();
-                break;
-            case 'PUT':
-                // $response = $this->updateUser($this->userId);
-                break;
-            case 'DELETE':
-                // $response = $this->deleteUser($this->userId);
+                $response = $this->loginUser();
                 break;
             default:
-                // $response = $this->notFoundResponse();
+                $response = $this->notFoundResponse();
                 break;
         }
-        // header($response['status_code_header']);
-        // if ($response['body']) {
-        //     echo $response['body'];
-        // }
+
+        http_response_code($response['status_code_header']);
+
+        if ($response['body']) {
+            echo $response['body'];
+        }
+
+    }
+    private function loginUser(){
+        $data = (array) json_decode(file_get_contents('php://input'), true);
+
+        $this->Login->username = $data["username"];
+
+        $Login = $this->Login->read();
+
+        // var_dump($Login["id"]);
+        // echo json_encode($Login["password"]);
+        // exit;
+
+        if(!password_verify($data['password'],$Login["password"])){
+            return $this->loginFailed();
+        }
+
+        $id = $Login["id"];
+        
+        $token = $this->generateJWTToken($id);
+
+        return $this->loginSuccess($token);
+
+    }
+    private function notFoundResponse(): array
+    {
+        $response['status_code_header'] = 404;
+        $response['body'] = json_encode([
+            'error' => 'Not found'
+        ]);
+        return $response;
+    }
+    private function loginSuccess($token): array
+    {
+        $response['status_code_header'] = 200;
+        $response['body'] = json_encode([
+            'message' => 'Login Success',
+            'Token' => $token
+        ]);
+        return $response;
+    }
+    private function loginFailed(): array
+    {
+        $response['status_code_header'] = 400;
+        $response['body'] = json_encode([
+            'message' => 'Login Failed'
+        ]);
+        return $response;
+    }
+    private function generateJWTToken($id): string
+    {
+        $payload = [
+            'iss' => $_SERVER["SERVER_NAME"], //issuer(who created and signed this token)
+            'iat' => time(),//issued at
+            'exp' => strtotime("+1 hour"),//expiration time
+            'id' => $id
+        ];
+
+        $encode = JWT::encode($payload, $this->key, 'HS256');
+
+        return $encode;
     }
 }

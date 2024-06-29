@@ -1,6 +1,9 @@
 <?php
+namespace api\model;
+
+use PDO;
 class Login {
-    private $conn;
+    private PDO $conn;
     private $table = 'user';
 
     public $id;
@@ -8,68 +11,26 @@ class Login {
     public $password;
 
     public function __construct($db) {
-        $this->conn = $db;
+        $this->conn = $db->connect();
     }
     
     public function AuthTest() {
         return "test";
     }
-
-    public function read() {
-        $query = 'SELECT * FROM ' . $this->table;
-        $stmt = $this->conn->prepare($query);
-        $stmt->execute();
-        return $stmt;
-    }
     
-    public function readSingle() {
-        $query = 'SELECT * FROM ' . $this->table . 'WHERE id = :id';
+    public function read() {
+        $query = 'SELECT * FROM ' . $this->table . ' WHERE username = :username';
         $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':id', $this->id);
+
+        $stmt->bindParam(':username', $this->username, PDO::PARAM_STR);
+
+        // echo json_encode($query);
+        // exit;
+
         $stmt->execute();
-        return $stmt;
-    }
-
-    public function create() {
-        // SYNTAX ERROR FOR QUERY
-        $query = 'INSERT INTO ' . $this->table . '(username, password) VALUE (username = :username, password = :password)';
-        $stmt = $this->conn->prepare($query);
-        
-        $stmt->bindParam(':username', $this->username);
-        $stmt->bindParam(':password', $this->password);
-
-        if ($stmt->execute()) {
-            return true;
-        }
-
-        return false;
-    }
-
-    public function update() {
-        $query = 'UPDATE ' . $this->table . ' SET username = :username, password = :password WHERE id = :id';
-        $stmt = $this->conn->prepare($query);
-        
-        $stmt->bindParam(':username', $this->username);
-        $stmt->bindParam(':password', $this->password);
-        $stmt->bindParam(':id', $this->id);
-
-        if ($stmt->execute()) {
-            return true;
-        }
-
-        return false;
-    }
-
-    public function delete() {
-        $query = 'DELETE FROM ' . $this->table . ' WHERE id = :id';
-        $stmt = $this->conn->prepare($query);
-        
-        $stmt->bindParam(':id', $this->id);
-
-        if ($stmt->execute()) {
-            return true;
-        }
-
-        return false;
+        $result = $stmt->fetch();
+        // echo json_encode($result);
+        // exit;
+        return $result;
     }
 }

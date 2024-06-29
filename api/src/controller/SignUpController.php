@@ -3,34 +3,26 @@ require_once __DIR__ . '/../model/SignUp.php';
 require_once '../vendor/autoload.php';
 
 use Firebase\JWT\JWT;
+use api\model\SignUp;
+
 class SignUpController{
 
-    private $requestMethod;
-    private $db;
     private $key = "CI6IkpXVCJ9";
-    private $SignUp;
     private $extraArgument;
-    private static $staticProperty = "static propertie's value";
+    private $SignUp;
 
-    public function __construct($db ,$requestMethod, ...$extraArgument)
+    public function __construct(private $db ,private $requestMethod, ...$extraArgument)
     {
-        $this->db = $db->connect();
-        $this->requestMethod = $requestMethod;
-        // self::$staticProperty = $this->requestMethod;
         $this->extraArgument = $extraArgument;
-        
         $this->SignUp = new SignUp($db);
+    }
 
-    }
-    public static function staticFunction(){
-        echo json_encode([self::$staticProperty]);
-    }
     public function test(){
         // $test = $this->auth->AuthTest();
         if ($this->requestMethod) {
             // echo json_encode($this->queryArray["id"]);
             echo $this->requestMethod;
-            echo json_encode([$this->extraArgument, $this->SignUp->testFunction(), self::$staticProperty]);
+            echo json_encode([$this->extraArgument, $this->SignUp->testFunction()]);
             exit;
         }else{
             echo json_encode("No ID");
@@ -47,28 +39,43 @@ class SignUpController{
                 $response = $this->notFoundResponse();
                 break;
         }
-        header($response['status_code_header']);
+        http_response_code($response['status_code_header']);
         if ($response['body']) {
             echo $response['body'];
-            exit;
         }
+        exit;
     }
 
-    private function signUp()
+    private function signUp(): array
     {
         $data = (array) json_decode(file_get_contents('php://input'), true);
 
         if(!$this->validateInput($data)){
+
             $this->unprocessableEntityResponse();
+            
         }
 
         $this->SignUp->username = $data['username'];
-        $this->SignUp->password = $data['password'];
+
+        $hashed = password_hash($data['password'], PASSWORD_BCRYPT, ['cost' => 12]);
+
+        $this->SignUp->password = $hashed;
+
+        $rows = count($this->SignUp->read());
+
+        if($rows >= 1){
+
+            return $this->usernameExist();
+
+        }
 
         $signup = $this->SignUp->create();
 
         if (!$signup){
+
             return $this->createErrorResponse();
+
         }
 
         $JWTToken = $this->generateJWTToken($signup);
@@ -95,16 +102,16 @@ class SignUpController{
         return isset($input['username']) && isset($input['password']);
     }
 
-    private function createdResponse($data): array
+    private function createdResponse($data = ""): array
     {
-        $response['status_code_header'] = 'HTTP/1.1 201 Created';
+        $response['status_code_header'] = 201;
         $response['body'] = json_encode($data);
         return $response;
     }
 
     private function createErrorResponse(): array
     {
-        $response['status_code_header'] = 'HTTP/1.1 201 Created';
+        $response['status_code_header'] = 'HTTP/1.1 500 Internal Server Error';
         $response['body'] = json_encode([
             'error' => 'Something went wrong while inserting to database'
         ]);
@@ -125,6 +132,14 @@ class SignUpController{
         $response['status_code_header'] = 'HTTP/1.1 404 Not Found';
         $response['body'] = json_encode([
             'error' => 'Not found'
+        ]);
+        return $response;
+    }
+    private function usernameExist(): array
+    {
+        $response['status_code_header'] = 400;
+        $response['body'] = json_encode([
+            'error' => 'Username Exist'
         ]);
         return $response;
     }

@@ -5,6 +5,8 @@ require_once 'config/database.php';
 
 spl_autoload_register(fn($class)=> require __DIR__ . "/controller/$class.php");
 
+use api\config\Database;
+
 $requestMethod = $_SERVER["REQUEST_METHOD"];
 
 $requestURI = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
@@ -55,11 +57,11 @@ $Controller = $ControllerArray[0];
 
 $pdo = new Database();
 
-$test = new $Controller($pdo, $requestMethod, $requestQueryArray);
+$Controller = new $Controller($pdo, $requestMethod, $requestQueryArray);
 
 // echo json_encode([$pdo, $requestMethod, $requestQueryArray]);
 // return;
-// $test->processRequest();
-// $test->test();
-$Controller::staticFunction();
+$Controller->processRequest(); 
+// $Controller->test();
+// $Controller::staticFunction();
 exit;

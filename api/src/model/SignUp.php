@@ -1,4 +1,7 @@
 <?php
+namespace api\model;
+
+use PDO;
 class SignUp {
     private PDO $conn;
     private $table = 'user';
@@ -7,7 +10,7 @@ class SignUp {
     public $username;
     public $password;
 
-    public function __construct(Database $db) {
+    public function __construct($db) {
         $this->conn = $db->connect();
     }
     
@@ -28,5 +31,15 @@ class SignUp {
         }
 
         return false;
+    }
+    public function read() {
+        $query = 'SELECT username FROM ' . $this->table . ' WHERE username = :username';
+        $stmt = $this->conn->prepare($query);
+
+        $stmt->bindParam(':username', $this->username, PDO::PARAM_STR);
+
+        $stmt->execute();
+        $result = $stmt->fetch();
+        return $result;
     }
 }

@@ -1,7 +1,4 @@
 <?php
-namespace api\model;
-
-use PDO;
 class Login {
     private PDO $conn;
     private $table = 'user';

@@ -1,15 +1,13 @@
 <?php
 
 require_once 'routes.php';
-require_once 'config/database.php';
+require_once 'config/Database.php';
 require_once 'services/ErrorHandler.php';
-
 spl_autoload_register(fn($class)=> require __DIR__ . "/controller/$class.php");
-
-use api\config\Database;
 
 set_error_handler("ErrorHandler::handleError");
 set_exception_handler("ErrorHandler::handleException");
+
 
 $requestMethod = $_SERVER["REQUEST_METHOD"];
 
@@ -60,7 +58,7 @@ $ControllerArray = $routes[$URLPath];
 $Controller = $ControllerArray[0];
 
 $pdo = new Database();
-
+// use api\controller\SignUpController;
 $Controller = new $Controller($pdo, $requestMethod, $requestQueryArray);
 
 // echo json_encode([$pdo, $requestMethod, $requestQueryArray]);

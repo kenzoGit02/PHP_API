@@ -1,9 +1,9 @@
 <?php
+
 require_once __DIR__ . '/../model/SignUp.php';
 require_once '../vendor/autoload.php';
 
 use Firebase\JWT\JWT;
-use api\model\SignUp;
 
 class SignUpController{
 
@@ -11,13 +11,14 @@ class SignUpController{
     private $extraArgument;
     private $SignUp;
 
-    public function __construct(private $db ,private $requestMethod, ...$extraArgument)
+    public function __construct(private $db, private $requestMethod, ...$extraArgument)
     {
         $this->extraArgument = $extraArgument;
         $this->SignUp = new SignUp($db);
     }
 
-    public function test(){
+    public function test(): void
+    {
         // $test = $this->auth->AuthTest();
         if ($this->requestMethod) {
             // echo json_encode($this->queryArray["id"]);
@@ -30,7 +31,8 @@ class SignUpController{
         }
     }
 
-    public function ProcessRequest(){
+    public function ProcessRequest(): void
+    {
         switch ($this->requestMethod) {
             case 'POST':
                 $response = $this->signUp();
@@ -62,9 +64,7 @@ class SignUpController{
 
         $this->SignUp->password = $hashed;
 
-        $rows = count($this->SignUp->read());
-
-        if($rows >= 1){
+        if($this->SignUp->read()){
 
             return $this->usernameExist();
 
@@ -104,8 +104,12 @@ class SignUpController{
 
     private function createdResponse($data = ""): array
     {
+        $data = (empty($data)) ? "Create Succesful" : $data;
+
         $response['status_code_header'] = 201;
-        $response['body'] = json_encode($data);
+        $response['body'] = json_encode([
+            "message" => $data
+        ]);
         return $response;
     }
 

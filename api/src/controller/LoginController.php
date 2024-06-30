@@ -1,9 +1,9 @@
 <?php
+
 require_once __DIR__ . '/../model/Login.php';
 require_once '../vendor/autoload.php';
 
 use Firebase\JWT\JWT;
-use api\model\Login;
 class LoginController{
 
     private $key = "CI6IkpXVCJ9";
@@ -16,7 +16,8 @@ class LoginController{
         $this->Login = new Login($db);
     }
 
-    public function test(){
+    public function test(): void
+    {
 
         if ($this->requestMethod) {
 
@@ -34,7 +35,8 @@ class LoginController{
         }
     }
 
-    public function ProcessRequest(){
+    public function ProcessRequest(): void
+    {
 
         switch ($this->requestMethod) {
             case 'POST':
@@ -52,12 +54,18 @@ class LoginController{
         }
 
     }
-    private function loginUser(){
+
+    private function loginUser(): array
+    {
         $data = (array) json_decode(file_get_contents('php://input'), true);
 
         $this->Login->username = $data["username"];
 
-        $Login = $this->Login->read();
+        if(!$Login = $this->Login->read()){
+
+            return $this->loginFailed();
+
+        }
 
         // var_dump($Login["id"]);
         // echo json_encode($Login["password"]);
@@ -74,6 +82,7 @@ class LoginController{
         return $this->loginSuccess($token);
 
     }
+
     private function notFoundResponse(): array
     {
         $response['status_code_header'] = 404;
@@ -82,6 +91,7 @@ class LoginController{
         ]);
         return $response;
     }
+
     private function loginSuccess($token): array
     {
         $response['status_code_header'] = 200;
@@ -91,6 +101,7 @@ class LoginController{
         ]);
         return $response;
     }
+
     private function loginFailed(): array
     {
         $response['status_code_header'] = 400;
@@ -99,6 +110,7 @@ class LoginController{
         ]);
         return $response;
     }
+
     private function generateJWTToken($id): string
     {
         $payload = [

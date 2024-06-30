@@ -1,7 +1,7 @@
 <?php
-// api/controllers/PostController.php
-// require_once 'D:\xampp\htdocs\MVC_API\api\src\model\User.php';
+
 require_once __DIR__ . '/../model/User.php';
+
 class UserController {
 
     private $db;
@@ -49,7 +49,7 @@ class UserController {
     private function getAllUsers() {
         
         $result = $this->user->read();
-        $users = $result->fetchAll(PDO::FETCH_ASSOC);
+        $users = $result->fetchAll();
         return $this->okResponse($users);
         // echo json_encode($this->okResponse($posts));
     }

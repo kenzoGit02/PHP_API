@@ -1,5 +1,4 @@
 <?php
-// api/routes.php
 
 $routes = [
     'user' => ['UserController'],

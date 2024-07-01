@@ -1,16 +1,18 @@
 <?php
 
-require_once __DIR__ . '/../model/Login.php';
+namespace api\src\controller;
+
 require_once '../vendor/autoload.php';
 
 use Firebase\JWT\JWT;
+use api\src\model\Login;
 class LoginController{
 
     private $key = "CI6IkpXVCJ9";
     private $extraArgument;
     private $Login;
 
-    public function __construct(private $db ,private $requestMethod, ...$extraArgument)
+    public function __construct(private $db, private $requestMethod, ...$extraArgument)
     {
         $this->extraArgument = $extraArgument;
         $this->Login = new Login($db);

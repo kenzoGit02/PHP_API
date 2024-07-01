@@ -1,13 +1,31 @@
 <?php
 
 require_once 'routes.php';
-require_once 'config/Database.php';
+// require_once 'config/Database.php';
 require_once 'services/ErrorHandler.php';
-spl_autoload_register(fn($class)=> require __DIR__ . "/controller/$class.php");
+// spl_autoload_register(fn($class)=> require __DIR__ . "/controller/$class.php");
+spl_autoload_register(function($class){
+    var_dump($class);
+    $filteredString = preg_replace('/^api\\\\/',"", $class);
+    $path = __DIR__ ."\\..\\$filteredString.php";
+    $controllerPath = __DIR__ . "/controller/$class.php";
 
+    var_dump($controllerPath);
+    if(file_exists($path)){
+        require $path;
+    }
+    if(file_exists($controllerPath)){
+        require $controllerPath;
+    }
+});
+use api\config\Database;
+use api\src\controller\SignUpController;
 set_error_handler("ErrorHandler::handleError");
 set_exception_handler("ErrorHandler::handleException");
-
+new Database();
+$Controller = __DIR__ .'\\controller\\SignUpController';
+new $Controller();
+exit;
 
 $requestMethod = $_SERVER["REQUEST_METHOD"];
 
@@ -55,10 +73,10 @@ if (!isset($routes[$URLPath])){
 $ControllerArray = $routes[$URLPath];
 
 //array index 0 to string
-$Controller = $ControllerArray[0];
+$Controller = __DIR__ .'\\controller\\'.$ControllerArray[0];
 
 $pdo = new Database();
-// use api\controller\SignUpController;
+// use api\src\controller\SignUpController;
 $Controller = new $Controller($pdo, $requestMethod, $requestQueryArray);
 
 // echo json_encode([$pdo, $requestMethod, $requestQueryArray]);

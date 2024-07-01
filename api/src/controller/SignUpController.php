@@ -1,10 +1,11 @@
 <?php
 
-require_once __DIR__ . '/../model/SignUp.php';
+namespace api\src\controller;
+
 require_once '../vendor/autoload.php';
 
 use Firebase\JWT\JWT;
-
+use api\src\model\SignUp;
 class SignUpController{
 
     private $key = "CI6IkpXVCJ9";

@@ -1,38 +1,69 @@
 <?php
 
-require_once 'controller/UserController.php';
-require_once 'config/database.php';
-// require_once 'view/json.php';
+require_once 'routes.php';
+require_once '../vendor/autoload.php';
 
-$uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+use api\config\Database;
+use api\src\services\ErrorHandler;
+
+set_error_handler([ErrorHandler::class, 'handleError']);
+set_exception_handler([ErrorHandler::class, 'handleException']);
+
 $requestMethod = $_SERVER["REQUEST_METHOD"];
 
-$parsedURL = parse_url($_SERVER['REQUEST_URI'], PHP_URL_QUERY);
-if(parse_url($_SERVER['REQUEST_URI'], PHP_URL_QUERY)){
-    parse_str($parsedURL, $output);
-    print_r($output);
-    print_r($parsedURL);
-    echo "test1";
+$requestURI = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+
+$URLPath;
+$requestQueryArray = [];
+$Controller;
+
+$pattern = "/MVC_API\/api\/(.+)/";
+if (preg_match($pattern, $requestURI, $matches)) {
+
+    $URLPath = $matches[1];
+
+} else {
+
+    http_response_code(404);
+
+    echo json_encode(["Error message" => "Resource does not exist"]);
+
+    exit();
 }
-echo "test2";
-print_r($requestMethod);
-return;
-$userId = null;
-$test = preg_match('/MVC_API\/api\/user\/([0-9])*/', $uri, $matches);
 
-if (preg_match('/MVC_API\/api\/user\/([0-9]*)/', $uri, $matches)) {
-    if (isset($matches[1]) && $matches[1] !== '') {
-        $userId = (int) $matches[1];
-    }
+//checking for url queries
+if ($URLQuery = parse_url($_SERVER['REQUEST_URI'], PHP_URL_QUERY)){
+
+    parse_str($URLQuery, $output);
+
+    $requestQueryArray = $output;
+
+    // echo json_encode(["Array" => $requestQueryArray]);
 }
 
-$database = new Database();
-$db = $database->connect();
+//if the route is not on the routes list, return error
+if (!isset($routes[$URLPath])){
 
-$controller = new UserController($db, $requestMethod, $userId);
-$data = $controller->processRequest();
+    http_response_code(404);
 
-// echo $data;
+    echo json_encode(["error message" => "No URL FOUND"]);
+
+    exit;
+}
+
+//get controller name from routes
+$ControllerArray = $routes[$URLPath];
+
+//array index 0 to string
+$Controller = 'api\\src\\controller\\'.$ControllerArray[0];
+
+$pdo = new Database();
+// use api\src\controller\SignUpController;
+$Controller = new $Controller($pdo, $requestMethod, $requestQueryArray);
+
+// echo json_encode([$pdo, $requestMethod, $requestQueryArray]);
 // return;
-// render($data);
-?>
+$Controller->processRequest(); 
+// $Controller->test();
+// $Controller::staticFunction();
+exit;

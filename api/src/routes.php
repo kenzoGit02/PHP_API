@@ -1,4 +1,5 @@
 <?php
+namespace api\src;
 
 $routes = [
     'user' => ['UserController'],

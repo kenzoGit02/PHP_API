@@ -6,7 +6,9 @@ require_once '../vendor/autoload.php';
 
 use Firebase\JWT\JWT;
 use api\src\model\SignUp;
-class SignUpController{
+use api\src\services\AuthChecker;
+class SignUpController
+{
 
     private $key = "CI6IkpXVCJ9";
     private $extraArgument;

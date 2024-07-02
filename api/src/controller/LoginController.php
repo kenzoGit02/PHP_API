@@ -4,11 +4,13 @@ namespace api\src\controller;
 
 require_once '../vendor/autoload.php';
 
-use Firebase\JWT\JWT;
+// use Firebase\JWT\JWT;
 use api\src\model\Login;
-class LoginController{
+use api\src\services\Auth;
+class LoginController
+{
 
-    private $key = "CI6IkpXVCJ9";
+    // private $key = "CI6IkpXVCJ9";
     private $extraArgument;
     private $Login;
 
@@ -79,7 +81,10 @@ class LoginController{
 
         $id = $Login["id"];
         
-        $token = $this->generateJWTToken($id);
+        $token = Auth::generateJWTToken($id);
+        if(!$token){
+            return $this->loginFailed();
+        }
 
         return $this->loginSuccess($token);
 
@@ -111,19 +116,5 @@ class LoginController{
             'message' => 'Login Failed'
         ]);
         return $response;
-    }
-
-    private function generateJWTToken($id): string
-    {
-        $payload = [
-            'iss' => $_SERVER["SERVER_NAME"], //issuer(who created and signed this token)
-            'iat' => time(),//issued at
-            'exp' => strtotime("+1 hour"),//expiration time
-            'id' => $id
-        ];
-
-        $encode = JWT::encode($payload, $this->key, 'HS256');
-
-        return $encode;
     }
 }

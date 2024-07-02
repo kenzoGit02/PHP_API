@@ -13,14 +13,17 @@ $requestMethod = $_SERVER["REQUEST_METHOD"];
 
 $requestURI = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
-$URLPath;
+
 $requestQueryArray = [];
 $Controller;
 
+//checking for resource name
 $pattern = "/MVC_API\/api\/(.+)/";
 if (preg_match($pattern, $requestURI, $matches)) {
 
-    $URLPath = $matches[1];
+    $resource = $matches[1];
+    // echo json_encode([$matches[1], $matches[0]]);
+    // exit("lel");
 
 } else {
 
@@ -28,8 +31,21 @@ if (preg_match($pattern, $requestURI, $matches)) {
 
     echo json_encode(["Error message" => "Resource does not exist"]);
 
-    exit();
+    exit;
 }
+
+// echo "\n control1 \n";
+$resourceID;
+//checking if resource has an ID included
+if (preg_match("/(.+)\/(.+)/", $resource, $matches)){
+    // echo "\n control 2\n";
+    $resource = $matches[1];
+    $resourceID = $matches[2];
+    
+    // exit("with ID");
+}
+// echo "\n control3 \n";
+// exit($resourceID);
 
 //checking for url queries
 if ($URLQuery = parse_url($_SERVER['REQUEST_URI'], PHP_URL_QUERY)){
@@ -39,10 +55,11 @@ if ($URLQuery = parse_url($_SERVER['REQUEST_URI'], PHP_URL_QUERY)){
     $requestQueryArray = $output;
 
     // echo json_encode(["Array" => $requestQueryArray]);
+    // exit;
 }
 
-//if the route is not on the routes list, return error
-if (!isset($routes[$URLPath])){
+//if the route is not on the routes list, respond with error
+if (!isset($routes[$resource])){
 
     http_response_code(404);
 
@@ -51,19 +68,22 @@ if (!isset($routes[$URLPath])){
     exit;
 }
 
-//get controller name from routes
-$ControllerArray = $routes[$URLPath];
+//get controller name from routes array
+$ControllerArray = $routes[$resource];
 
-//array index 0 to string
+//ControllerArray's index 0 to string
 $Controller = 'api\\src\\controller\\'.$ControllerArray[0];
 
 $pdo = new Database();
-// use api\src\controller\SignUpController;
-$Controller = new $Controller($pdo, $requestMethod, $requestQueryArray);
+
+$resourceID = $resourceID ?? null;
+// var_dump($resourceID);
+// exit();
+$Controller = new $Controller($pdo, $requestMethod, $resourceID, $requestQueryArray);
 
 // echo json_encode([$pdo, $requestMethod, $requestQueryArray]);
 // return;
-$Controller->processRequest(); 
+$Controller->test(); 
 // $Controller->test();
 // $Controller::staticFunction();
 exit;

@@ -14,7 +14,7 @@ class SignUpController
     private $extraArgument;
     private $SignUp;
 
-    public function __construct(private $db, private $requestMethod, ...$extraArgument)
+    public function __construct(private $db, private $requestMethod, private $id , ...$extraArgument)
     {
         $this->extraArgument = $extraArgument;
         $this->SignUp = new SignUp($db);

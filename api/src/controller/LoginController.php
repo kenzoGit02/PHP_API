@@ -9,12 +9,10 @@ use api\src\model\Login;
 use api\src\services\Auth;
 class LoginController
 {
-
-    // private $key = "CI6IkpXVCJ9";
     private $extraArgument;
     private $Login;
 
-    public function __construct(private $db, private $requestMethod, ...$extraArgument)
+    public function __construct(private $db, private $requestMethod, private $id , ...$extraArgument)
     {
         $this->extraArgument = $extraArgument;
         $this->Login = new Login($db);
@@ -70,10 +68,6 @@ class LoginController
             return $this->loginFailed();
 
         }
-
-        // var_dump($Login["id"]);
-        // echo json_encode($Login["password"]);
-        // exit;
 
         if(!password_verify($data['password'],$Login["password"])){
             return $this->loginFailed();

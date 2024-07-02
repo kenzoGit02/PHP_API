@@ -1,4 +1,5 @@
 <?php
+namespace api\src\model;
 class User {
     private $conn;
     private $table = 'user';

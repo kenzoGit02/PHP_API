@@ -5,13 +5,14 @@ namespace api\src\controller;
 require_once __DIR__ . '/../model/User.php';
 
 use api\src\model\User;
+use PDO;
 
 class UserController {
 
     private $extraArgument;
     private $User;
 
-    public function __construct(private $db, private $requestMethod, private $id , ...$extraArgument) 
+    public function __construct(private PDO $db, private string $requestMethod, private string $id , ...$extraArgument) 
     {
 
         $this->extraArgument = $extraArgument;

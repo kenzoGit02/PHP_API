@@ -6,7 +6,7 @@ require_once '../vendor/autoload.php';
 
 use Firebase\JWT\JWT;
 use api\src\model\SignUp;
-use api\src\services\AuthChecker;
+use api\src\services\Auth;
 class SignUpController
 {
 
@@ -73,17 +73,21 @@ class SignUpController
 
         }
 
-        $signup = $this->SignUp->create();
+        $userId = $this->SignUp->create();
 
-        if (!$signup){
+        if (!$userId){
 
             return $this->createErrorResponse();
 
         }
+        
+        $token = Auth::generateJWTToken($userId);
 
-        $JWTToken = $this->generateJWTToken($signup);
+        // if(!$token){
+        //     return $this->loginFailed();
+        // }
 
-        return $this->createdResponse($JWTToken);
+        return $this->createdResponse($token);
     }
 
     private function generateJWTToken($id): string

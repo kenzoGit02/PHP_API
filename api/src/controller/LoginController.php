@@ -76,6 +76,7 @@ class LoginController
         $id = $Login["id"];
         
         $token = Auth::generateJWTToken($id);
+        
         if(!$token){
             return $this->loginFailed();
         }

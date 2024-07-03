@@ -83,7 +83,7 @@ $Controller = new $Controller($pdo, $requestMethod, $resourceID, $requestQueryAr
 
 // echo json_encode([$pdo, $requestMethod, $requestQueryArray]);
 // return;
-$Controller->test(); 
+$Controller->ProcessRequest(); 
 // $Controller->test();
 // $Controller::staticFunction();
 exit;

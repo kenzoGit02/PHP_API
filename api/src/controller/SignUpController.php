@@ -34,7 +34,7 @@ class SignUpController
         }
     }
 
-    public function ProcessRequest(): void
+    public function processRequest(): void
     {
         switch ($this->requestMethod) {
             case 'POST':
@@ -83,9 +83,11 @@ class SignUpController
         
         $token = Auth::generateJWTToken($userId);
 
-        // if(!$token){
-        //     return $this->loginFailed();
-        // }
+        if(!$token){
+
+            return $this->JWTError();
+
+        }
 
         return $this->createdResponse($token);
     }
@@ -146,11 +148,21 @@ class SignUpController
         ]);
         return $response;
     }
+
     private function usernameExist(): array
     {
         $response['status_code_header'] = 400;
         $response['body'] = json_encode([
             'error' => 'Username Exist'
+        ]);
+        return $response;
+    }
+
+    private function JWTError(): array
+    {
+        $response['status_code_header'] = 400;
+        $response['body'] = json_encode([
+            'error' => 'JWT failed'
         ]);
         return $response;
     }

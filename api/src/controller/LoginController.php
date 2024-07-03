@@ -37,7 +37,7 @@ class LoginController
         }
     }
 
-    public function ProcessRequest(): void
+    public function processRequest(): void
     {
 
         switch ($this->requestMethod) {
@@ -70,7 +70,9 @@ class LoginController
         }
 
         if(!password_verify($data['password'],$Login["password"])){
+
             return $this->loginFailed();
+
         }
 
         $id = $Login["id"];
@@ -78,7 +80,9 @@ class LoginController
         $token = Auth::generateJWTToken($id);
         
         if(!$token){
-            return $this->loginFailed();
+            
+            return $this->JWTError();
+
         }
 
         return $this->loginSuccess($token);
@@ -109,6 +113,15 @@ class LoginController
         $response['status_code_header'] = 400;
         $response['body'] = json_encode([
             'message' => 'Login Failed'
+        ]);
+        return $response;
+    }
+
+    private function JWTError(): array
+    {
+        $response['status_code_header'] = 400;
+        $response['body'] = json_encode([
+            'error' => 'JWT failed'
         ]);
         return $response;
     }

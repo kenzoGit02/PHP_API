@@ -46,13 +46,6 @@ if (preg_match("/(.+)\/(.+)/", $resource, $matches)){
     // echo json_encode([$matches[1], $matches[2]]);
     // exit();
 
-} else {
-
-    http_response_code(404);
-
-    echo json_encode(['Error' => 'Resource does not exist']);
-
-    exit;
 }
 // echo "\n control3 \n";
 // exit($resourceID);
@@ -95,9 +88,9 @@ $Controller = new $Controller($pdo, $requestMethod, $resourceID, $requestQueryAr
 // echo json_encode([$pdo, $requestMethod, $requestQueryArray]);
 // exit;
 
-// $Controller->processRequest(); 
+$Controller->processRequest(); 
 
-$Controller->test();
+// $Controller->test();
 
 // $Controller::staticFunction();
 

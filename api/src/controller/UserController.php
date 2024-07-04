@@ -20,11 +20,12 @@ class UserController {
 
     }
 
-    public function test(): void
+    public function processRequest(): void
     {
         AuthChecker::authenticate();
-        echo json_encode([$this->db, $this->requestMethod, $this->id, $this->User, $this->extraArgument]);
-        exit;
+        // echo json_encode([$this->db, $this->requestMethod, $this->id, $this->User, $this->extraArgument]);
+        // echo "Test";
+        exit("exit");
     }
 
     // public function processRequest(): void

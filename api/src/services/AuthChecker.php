@@ -11,10 +11,11 @@ use Firebase\JWT\ExpiredException;
 class AuthChecker{
     private static $key = 'CI6IkpXVCJ9';
 
-    public static function authenticate(): bool
+    public static function authenticate(): void
     {
         $header = apache_request_headers();
-
+        // echo json_encode($header);
+        // exit;
         // check for 'Authorization' key inside request header, if none found the request is unauthorized
         if(!isset($header['Authorization'])){
 
@@ -49,7 +50,5 @@ class AuthChecker{
             // Handle other decoding errors
             echo json_encode(["Caught exception" => $e->getMessage()]);
         }
-
-        return false;
     }
 }

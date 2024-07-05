@@ -42,7 +42,7 @@ class AuthChecker{
             echo json_encode(["message" => "Token is still valid."]);
             
             // Print the decoded payload for debugging
-            print_r($decoded);
+            // print_r($decoded);
         } catch (ExpiredException $e) {
             // Handle token expiration specifically
             echo json_encode(["Token has expired" => $e->getMessage()]);

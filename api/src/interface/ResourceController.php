@@ -3,5 +3,5 @@
 namespace api\src\interface;
 
 interface ResourceController {
-    public function index();
+    public function index($request);
 }

@@ -39,7 +39,7 @@ class AuthChecker{
             $decoded = JWT::decode($token, new Key(self::$key,'HS256'));
 
             // If decoding is successful and no exception is thrown, the token is valid
-            echo json_encode(["message" => "Token is still valid."]);
+            // echo json_encode(["message" => "Token is still valid."]);
             
             // Print the decoded payload for debugging
             // print_r($decoded);

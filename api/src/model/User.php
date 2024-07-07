@@ -1,7 +1,8 @@
 <?php
 namespace api\src\model;
+use PDO;
 class User {
-    private $conn;
+    private PDO $conn;
     private $table = 'user';
 
     public $id;
@@ -12,31 +13,33 @@ class User {
         $this->conn = $db->connect();
     }
 
-    public function read() {
+    public function select() {
         $query = 'SELECT * FROM ' . $this->table;
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
-        return $stmt;
+        $result = $stmt->fetchAll();
+        return $result;
     }
     
-    public function readSingle() {
-        $query = 'SELECT * FROM ' . $this->table . 'WHERE id = :id';
+    public function selectSingle() {
+        $query = 'SELECT * FROM ' . $this->table . ' WHERE id = :id';
         $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':id', $this->id);
+        $stmt->bindParam(':id', $this->id, PDO::PARAM_STR);
         $stmt->execute();
-        return $stmt;
+        $result = $stmt->fetch();
+        return $result;
     }
 
-    public function create() {
+    public function insert() {
         // SYNTAX ERROR FOR QUERY
-        $query = 'INSERT INTO ' . $this->table . '(username, password) VALUE (username = :username, password = :password)';
+        $query = 'INSERT INTO ' . $this->table . '(username, password) VALUES (username = :username, password = :password)';
         $stmt = $this->conn->prepare($query);
         
         $stmt->bindParam(':username', $this->username);
         $stmt->bindParam(':password', $this->password);
 
         if ($stmt->execute()) {
-            return true;
+            return $this->conn->lastInsertId();
         }
 
         return false;

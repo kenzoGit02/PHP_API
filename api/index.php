@@ -11,3 +11,4 @@ set_error_handler([ErrorHandler::class, 'handleError']);
 set_exception_handler([ErrorHandler::class, 'handleException']);
 
 require_once "src/router.php";
+// require_once "src/services/Emailer.php";

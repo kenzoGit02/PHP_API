@@ -1,6 +1,7 @@
 {
     "require": {
-        "firebase/php-jwt": "^6.10"
+        "firebase/php-jwt": "^6.10",
+        "symfony/mailer": "^7.1"
     },
     "autoload": {
         "psr-4": {

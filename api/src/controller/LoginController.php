@@ -4,11 +4,13 @@ namespace api\src\controller;
 
 require_once '../vendor/autoload.php';
 
-// use Firebase\JWT\JWT;
 use api\src\model\Login;
 use api\src\services\Auth;
+use api\src\trait\Emailer;
+
 class LoginController
 {
+    use Emailer;
     private $extraArgument;
     private $Login;
 
@@ -88,6 +90,9 @@ class LoginController
             
             return $this->JWTError();
 
+        }
+        if($this->createEmail($data["email"], 21323123)){
+            exit('email sent');
         }
 
         return $this->loginSuccess($token);

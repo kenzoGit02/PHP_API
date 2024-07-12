@@ -49,6 +49,11 @@ class LoginController
                 break;
         }
 
+        if(!isset($response['status_code_header'])){
+            http_response_code(500);
+            exit;
+        }
+
         http_response_code($response['status_code_header']);
 
         if ($response['body']) {

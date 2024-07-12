@@ -13,7 +13,7 @@ class User {
         $this->conn = $db->connect();
     }
 
-    public function select() {
+    public function selectAll() {
         $query = 'SELECT * FROM ' . $this->table;
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
@@ -21,7 +21,7 @@ class User {
         return $result;
     }
     
-    public function selectSingle() {
+    public function select() {
         $query = 'SELECT * FROM ' . $this->table . ' WHERE id = :id';
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':id', $this->id, PDO::PARAM_STR);

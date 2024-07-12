@@ -7,20 +7,21 @@ require_once __DIR__ . '/../model/User.php';
 use api\src\interface\ResourceController;
 use api\src\model\User;
 use api\src\services\AuthChecker;
-
+use api\src\trait\Response;
 class UserController implements ResourceController{
+
+    use Response;
 
     private $extraArgument;
     private $User;
     
-    public function __construct(private $db, private string $requestMethod, private string|null $id , ...$extraArgument) 
+    public function __construct(private $db, private string $requestMethod, private string|null $id , mixed ...$extraArgument) 
     {
 
         $this->extraArgument = $extraArgument;
         $this->User = new User($db);
 
     }
-    
 
     public function test(): void
     {
@@ -32,33 +33,34 @@ class UserController implements ResourceController{
 
     public function processRequest(): void
     {
-        AuthChecker::authenticate();
+        $user = AuthChecker::authenticate();
 
-        $UserID = $this->id ?? null;
+        $requestUserID = $this->id ?? null;
 
         switch ($this->requestMethod) {
             case 'GET':
-                if (empty($UserID)) {
+                if (empty($requestUserID)) {
                     $response = $this->index();
                 } else {
-                    $response = $this->index($UserID);
+                    $response = $this->index($requestUserID);
                 }
                 break;
-            case 'POST':
-                $response = $this->create();
-                break;
+            // case 'POST':
+            //     $response = $this->create();
+            //     break;
             case 'PUT':
-                $response = $this->updateUser($UserID);
+                $response = $this->updateUser($requestUserID);
                 break;
             case 'DELETE':
-                $response = $this->deleteUser($UserID);
+                $response = $this->deleteUser($requestUserID);
                 break;
             default:
-                $response = $this->notFoundResponse();
+                $response = $this->methodNotallowed($this->requestMethod);
                 break;
         }
-
+        
         if(!isset($response['status_code_header'])){
+            http_response_code(500);
             exit;
         }
 
@@ -74,9 +76,12 @@ class UserController implements ResourceController{
     {
         if(isset($request)){
             $this->User->id = $request;
-            $UserData = $this->User->selectSingle();
-        } else {
             $UserData = $this->User->select();
+        } else {
+            $UserData = $this->User->selectAll();
+        }
+        if(!$UserData){
+            return $this->notFoundResponse();
         }
         return $this->okResponse($UserData);
     }
@@ -141,7 +146,7 @@ class UserController implements ResourceController{
     }
 
     private function unprocessableEntityResponse() {
-        $response['status_code_header'] = 'HTTP/1.1 422 Unprocessable Entity';
+        $response['status_code_header'] = 422;
         $response['body'] = json_encode([
             'error' => 'Invalid input'
         ]);
@@ -149,7 +154,7 @@ class UserController implements ResourceController{
     }
 
     private function notFoundResponse() {
-        $response['status_code_header'] = 'HTTP/1.1 404 Not Found';
+        $response['status_code_header'] = 404;
         $response['body'] = json_encode([
             'error' => 'Not found'
         ]);

@@ -4,11 +4,6 @@ require_once 'routes.php';
 require_once '../vendor/autoload.php';
 
 use api\config\Database;
-use api\src\services\ErrorHandler;
-
-
-set_error_handler([ErrorHandler::class, 'handleError']);
-set_exception_handler([ErrorHandler::class, 'handleException']);
 
 $requestMethod = $_SERVER["REQUEST_METHOD"];
 
@@ -83,7 +78,12 @@ $resourceID = $resourceID ?? null;
 // var_dump($resourceID);
 // exit();
 
-$Controller = new $Controller($pdo, $requestMethod, $resourceID, $requestQueryArray);
+$Controller = new $Controller(  
+                                db: $pdo, 
+                                requestMethod: $requestMethod, 
+                                id: $resourceID, 
+                                extraArgument: $requestQueryArray
+                            );
 
 // echo json_encode([$pdo, $requestMethod, $requestQueryArray]);
 // exit;

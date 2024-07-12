@@ -44,10 +44,18 @@ class SignUpController
                 $response = $this->notFoundResponse();
                 break;
         }
+
+        if(!isset($response['status_code_header'])){
+            http_response_code(500);
+            exit;
+        }
+
         http_response_code($response['status_code_header']);
+
         if ($response['body']) {
             echo $response['body'];
         }
+        
         exit;
     }
 
@@ -90,20 +98,6 @@ class SignUpController
         }
 
         return $this->createdResponse($token);
-    }
-
-    private function generateJWTToken($id): string
-    {
-        $payload = [
-            'iss' => $_SERVER["SERVER_NAME"], //issuer(who created and signed this token)
-            'iat' => time(),//issued at
-            'exp' => strtotime("+1 hour"),//expiration time
-            'id' => $id
-        ];
-
-        $encode = JWT::encode($payload, $this->key, 'HS256');
-
-        return $encode;
     }
 
     private function validateInput($input): bool 

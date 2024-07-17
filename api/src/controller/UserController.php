@@ -8,85 +8,52 @@ use api\src\interface\ResourceController;
 use api\src\model\User;
 use api\src\services\AuthChecker;
 use api\src\trait\Response;
+use api\src\trait\Validation;
+
 class UserController implements ResourceController{
 
     use Response;
+    use Validation;
 
-    private $extraArgument;
     private $User;
     
-    public function __construct(private $db, private string $requestMethod, private string|null $id , mixed ...$extraArgument) 
+    public function __construct(private $db) 
     {
 
-        $this->extraArgument = $extraArgument;
         $this->User = new User($db);
 
     }
-
-    public function test(): void
+    
+    public function index()
     {
         AuthChecker::authenticate();
-        // echo json_encode([$this->db, $this->requestMethod, $this->id, $this->User, $this->extraArgument]);
-        // echo "Test";
-        exit("exit");
-    }
 
-    public function processRequest(): void
-    {
-        $user = AuthChecker::authenticate();
+        $UserData = $this->User->selectAll();
 
-        $requestUserID = $this->id ?? null;
-
-        switch ($this->requestMethod) {
-            case 'GET':
-                if (empty($requestUserID)) {
-                    $response = $this->index();
-                } else {
-                    $response = $this->index($requestUserID);
-                }
-                break;
-            // case 'POST':
-            //     $response = $this->create();
-            //     break;
-            case 'PUT':
-                $response = $this->updateUser($requestUserID);
-                break;
-            case 'DELETE':
-                $response = $this->deleteUser($requestUserID);
-                break;
-            default:
-                $response = $this->methodNotallowed($this->requestMethod);
-                break;
-        }
-        
-        if(!isset($response['status_code_header'])){
-            http_response_code(500);
-            exit;
-        }
-
-        http_response_code($response['status_code_header']);
-
-        if ($response['body']) {
-            echo $response['body'];
-            exit;
-        }
-    }
-    
-    public function index($request = null)
-    {
-        if(isset($request)){
-            $this->User->id = $request;
-            $UserData = $this->User->select();
-        } else {
-            $UserData = $this->User->selectAll();
-        }
         if(!$UserData){
             return $this->notFoundResponse();
         }
+
         return $this->okResponse($UserData);
     }
 
-    private function create() {
+    public function show($request)
+    {
+        AuthChecker::authenticate();
+
+        $this->User->id = $request['id'];
+
+        $UserData = $this->User->select();
+
+        if(!$UserData){
+            return $this->notFoundResponse();
+        }
+
+        return $this->okResponse($UserData);
+    }
+
+    public function create() 
+    {
         // $input = (array) json_decode(file_get_contents('php://input'), true);
         // if (!$this->validateUser($input)) {
         //     return $this->unprocessableEntityResponse();
@@ -102,13 +69,17 @@ class UserController implements ResourceController{
         // return $this->unprocessableEntityResponse();
     }
 
-    private function updateUser($id) {
+    public function update($request) 
+    {
+
+        AuthChecker::authenticate();
+
         $input = (array) json_decode(file_get_contents('php://input'), true);
         if (!$this->validateUser($input)) {
             return $this->unprocessableEntityResponse();
         }
 
-        $this->User->id = $id;
+        $this->User->id = $request['id'];
         $this->User->username = $input['username'];
         $this->User->password = $input['password'];
 
@@ -119,45 +90,17 @@ class UserController implements ResourceController{
         return $this->unprocessableEntityResponse();
     }
 
-    private function deleteUser($id) {
-        $this->User->id = $id;
+    public function delete($request) 
+    {
 
+        AuthChecker::authenticate();
+
+        $this->User->id = $request['id'];
+        
         if ($this->User->delete()) {
             return $this->okResponse(null);
         }
 
         return $this->unprocessableEntityResponse();
-    }
-
-    private function validateUser($input) {
-        return isset($input['username']) && isset($input['password']);
-    }
-
-    private function okResponse($data) {
-        $response['status_code_header'] = 200;
-        $response['body'] = json_encode($data);
-        return $response;
-    }
-
-    private function createdResponse() {
-        $response['status_code_header'] = 'HTTP/1.1 201 Created';
-        $response['body'] = null;
-        return $response;
-    }
-
-    private function unprocessableEntityResponse() {
-        $response['status_code_header'] = 422;
-        $response['body'] = json_encode([
-            'error' => 'Invalid input'
-        ]);
-        return $response;
-    }
-
-    private function notFoundResponse() {
-        $response['status_code_header'] = 404;
-        $response['body'] = json_encode([
-            'error' => 'Not found'
-        ]);
-        return $response;
     }
 }

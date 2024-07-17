@@ -4,80 +4,53 @@ namespace api\src\controller;
 
 require_once '../vendor/autoload.php';
 
-use Firebase\JWT\JWT;
 use api\src\model\SignUp;
-use api\src\services\Auth;
+use api\src\trait\Emailer;
+use api\src\trait\Response;
+use api\src\trait\Validation;
+
 class SignUpController
 {
+    use Response;
+    use Validation;
+    use Emailer;
 
     private $key = "CI6IkpXVCJ9";
-    private $extraArgument;
     private $SignUp;
 
-    public function __construct(private $db, private $requestMethod, private $id , ...$extraArgument)
+    public function __construct(private $db)
     {
-        $this->extraArgument = $extraArgument;
         $this->SignUp = new SignUp($db);
     }
 
     public function test(): void
     {
-        // $test = $this->auth->AuthTest();
-        if ($this->requestMethod) {
-            // echo json_encode($this->queryArray["id"]);
-            echo $this->requestMethod;
-            echo json_encode([$this->extraArgument, $this->SignUp->testFunction()]);
-            exit;
-        }else{
-            echo json_encode("No ID");
-            exit;
-        }
+        echo json_encode([$this->db, $this->SignUp]);
+        exit("exit");
     }
 
-    public function processRequest(): void
+    public function signUp(): array
     {
-        switch ($this->requestMethod) {
-            case 'POST':
-                $response = $this->signUp();
-                break;
-            default:
-                $response = $this->notFoundResponse();
-                break;
-        }
+        $request = (array) json_decode(file_get_contents('php://input'), true);
 
-        if(!isset($response['status_code_header'])){
-            http_response_code(500);
-            exit;
-        }
-
-        http_response_code($response['status_code_header']);
-
-        if ($response['body']) {
-            echo $response['body'];
-        }
-        
-        exit;
-    }
-
-    private function signUp(): array
-    {
-        $data = (array) json_decode(file_get_contents('php://input'), true);
-
-        if(!$this->validateInput($data)){
+        if(!$this->validateInput($request)){
 
             $this->unprocessableEntityResponse();
 
         }
 
-        $this->SignUp->username = $data['username'];
+        $this->SignUp->email = $request['email'];
 
-        $hashed = password_hash($data['password'], PASSWORD_BCRYPT, ['cost' => 12]);
+        $hashed = password_hash($request['password'], PASSWORD_BCRYPT, ['cost' => 12]);
 
         $this->SignUp->password = $hashed;
+        
+        $verification_code = mt_rand(100000, 999999);
+        $this->SignUp->verification_code = $verification_code;
 
         if($this->SignUp->read()){
 
-            return $this->usernameExist();
+            return $this->emailExist();
 
         }
 
@@ -89,75 +62,7 @@ class SignUpController
 
         }
         
-        $token = Auth::generateJWTToken($userId);
-
-        if(!$token){
-
-            return $this->JWTError();
-
-        }
-
-        return $this->createdResponse($token);
-    }
-
-    private function validateInput($input): bool 
-    {
-        return isset($input['username']) && isset($input['password']);
-    }
-
-    private function createdResponse($data = ""): array
-    {
-        $data = (empty($data)) ? "Create Succesful" : $data;
-
-        $response['status_code_header'] = 201;
-        $response['body'] = json_encode([
-            "message" => $data
-        ]);
-        return $response;
-    }
-
-    private function createErrorResponse(): array
-    {
-        $response['status_code_header'] = 'HTTP/1.1 500 Internal Server Error';
-        $response['body'] = json_encode([
-            'error' => 'Something went wrong while inserting to database'
-        ]);
-        return $response;
-    }
-
-    private function unprocessableEntityResponse(): array
-    {
-        $response['status_code_header'] = 'HTTP/1.1 422 Unprocessable Entity';
-        $response['body'] = json_encode([
-            'error' => 'Invalid input'
-        ]);
-        return $response;
-    }
-
-    private function notFoundResponse(): array
-    {
-        $response['status_code_header'] = 'HTTP/1.1 404 Not Found';
-        $response['body'] = json_encode([
-            'error' => 'Not found'
-        ]);
-        return $response;
-    }
-
-    private function usernameExist(): array
-    {
-        $response['status_code_header'] = 400;
-        $response['body'] = json_encode([
-            'error' => 'Username Exist'
-        ]);
-        return $response;
-    }
-
-    private function JWTError(): array
-    {
-        $response['status_code_header'] = 400;
-        $response['body'] = json_encode([
-            'error' => 'JWT failed'
-        ]);
-        return $response;
+        $this->createEmail(to: $request["email"], verification_code: $verification_code);
+        return $this->emailSent();
     }
 }

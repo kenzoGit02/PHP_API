@@ -1,97 +1,98 @@
 <?php
 
-require_once 'routes.php';
-require_once '../vendor/autoload.php';
+namespace api\src;
 
 use api\config\Database;
 
-$requestMethod = $_SERVER["REQUEST_METHOD"];
+class Router{
 
-$requestURI = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+    public static function processRequest($requestMethod, $requestURL ,$routes)
+    {
+        list($requestEndPoint, $requestEndPointID) = self::getEndpointString($requestURL);
 
+        $requestQueryArray = self::get_URL_Request();
 
-$requestQueryArray = [];
-$Controller;
+        $pdo = new Database();
+        
+        list($controllerName, $method) = self::getEndpointFromRoutes($routes, $requestMethod, $requestEndPoint);
 
-//checking for resource name
-$pattern = "/MVC_API\/api\/(.+)/";
-if (preg_match($pattern, $requestURI, $matches)) {
+        $controllerName = new $controllerName(db: $pdo);
 
-    $resource = $matches[1];
-    // echo json_encode([$matches[1], $matches[0]]);
-    // exit();
+        if (!method_exists($controllerName, $method)) {
+            echo json_encode(['Server Error' => 'Method Does Not Exist']);
+            http_response_code(500);
+            exit;
+        }
 
-} else {
+        //task: make sure there is no other id key inside the request
 
-    http_response_code(404);
+        $requestEndPointID = ['id' => $requestEndPointID];
 
-    echo json_encode(['Error' => 'Resource does not exist']);
+        $request = array_merge($requestQueryArray, $requestEndPointID);
 
-    exit;
+        $requestResponse = $controllerName->$method($request);
+        
+        return $requestResponse;
+
+    }
+
+    private static function getEndpointString($requestURL): array
+    {
+            //if the requestURL's formatting is correct, 
+        if(preg_match("/MVC_API\/api(.+)/", $requestURL, $matches)) {
+
+            $requestEndPoint = $matches[1];
+        
+        } else {
+            http_response_code(404);
+            echo json_encode(['User Error' => 'Wrong Endpoint Format']);
+            exit;
+        }
+        
+            //checking if requestEndPoint has an ID included, extract it and modify requestEndPoint accordingly
+        if(preg_match("/(.+)\/(.+)/", $requestEndPoint, $matches)){
+
+            $requestEndPointID = $matches[2];
+            $requestEndPoint = $matches[1] . "/{id}";
+
+        }
+
+        return [$requestEndPoint, $requestEndPointID = $requestEndPointID ?? null];
+    }
+
+    private static function get_URL_Request(): array
+    {
+        $requestQueryArray = [];
+
+            //checking for url queries
+        if ($URLQuery = parse_url($_SERVER['REQUEST_URI'], PHP_URL_QUERY)){
+            parse_str($URLQuery, $output);
+            $requestQueryArray = $output;
+        }
+
+        return $requestQueryArray;
+    }
+
+    private static function getEndpointFromRoutes($routes, $requestMethod, $requestEndPoint): array
+    {
+        // echo 'vardump routes';
+        // var_dump($routes);
+        // exit;
+            //if the http verb is not allowed, respond with error
+        if (!isset($routes[$requestMethod])){
+            http_response_code(404);
+            echo json_encode(['error message' => 'No Endpoint Found']);
+            exit('exit a');
+        }
+        
+        foreach($routes[$requestMethod] as $endPoint => $value){
+            if($requestEndPoint == $endPoint){
+                return $value;
+            }
+        }
+            //this part can only be reached if there is no endpoint found inside the list
+        http_response_code(404);
+        echo json_encode(['error message' => 'No Endpoint Found']);
+        exit('exit c');
+    }
 }
-
-// echo "\n control1 \n";
-
-//checking if resource has an ID included
-if (preg_match("/(.+)\/(.+)/", $resource, $matches)){
-    // echo "\n control 2\n";
-    $resource = $matches[1];
-    $resourceID = $matches[2];
-
-    // echo json_encode([$matches[1], $matches[2]]);
-    // exit();
-
-}
-// echo "\n control3 \n";
-// exit($resourceID);
-
-//checking for url queries
-if ($URLQuery = parse_url($_SERVER['REQUEST_URI'], PHP_URL_QUERY)){
-
-    parse_str($URLQuery, $output);
-
-    $requestQueryArray = $output;
-
-    // echo json_encode(["Array" => $requestQueryArray]);
-    // exit;
-}
-
-//if the route is not on the routes list, respond with error
-if (!isset($routes[$resource])){
-
-    http_response_code(404);
-
-    echo json_encode(['error message' => 'No URL FOUND']);
-
-    exit;
-}
-
-//get controller name from routes array
-$ControllerArray = $routes[$resource];
-
-//ControllerArray's index 0 to string
-$Controller = (string) $ControllerArray;
-
-$pdo = new Database();
-
-$resourceID = $resourceID ?? null;
-// var_dump($resourceID);
-// exit();
-
-$Controller = new $Controller(  
-                                db: $pdo, 
-                                requestMethod: $requestMethod, 
-                                id: $resourceID, 
-                                extraArgument: $requestQueryArray
-                            );
-
-// echo json_encode([$pdo, $requestMethod, $requestQueryArray]);
-// exit;
-
-$Controller->processRequest(); 
-
-// $Controller->test();
-
-// $Controller::staticFunction();
-
-exit;

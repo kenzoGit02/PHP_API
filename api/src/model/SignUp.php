@@ -8,24 +8,26 @@ class SignUp {
     private $table = 'user';
 
     public $id;
-    public $username;
+    public $email;
     public $password;
+    public $verification_code;
 
     public function __construct($db) {
         $this->conn = $db->connect();
     }
     
     public function testFunction() {
-        return [$this->password, $this->username];
+        return [$this->password, $this->email];
     }
 
     public function create(): string|false
     {
-        $query = 'INSERT INTO ' . $this->table . '(username, password) VALUES (:username, :password)';
+        $query = 'INSERT INTO ' . $this->table . '(email, password, verification_code) VALUES (:email, :password, :verification_code)';
         $stmt = $this->conn->prepare($query);
         
-        $stmt->bindParam(':username', $this->username, PDO::PARAM_STR);
+        $stmt->bindParam(':email', $this->email, PDO::PARAM_STR);
         $stmt->bindParam(':password', $this->password, PDO::PARAM_STR);
+        $stmt->bindParam(':verification_code', $this->verification_code, PDO::PARAM_STR);
 
         if ($stmt->execute()) {
             return $this->conn->lastInsertId();
@@ -34,10 +36,10 @@ class SignUp {
         return false;
     }
     public function read() {
-        $query = 'SELECT username FROM ' . $this->table . ' WHERE username = :username';
+        $query = 'SELECT * FROM ' . $this->table . ' WHERE email = :email';
         $stmt = $this->conn->prepare($query);
 
-        $stmt->bindParam(':username', $this->username, PDO::PARAM_STR);
+        $stmt->bindParam(':email', $this->email, PDO::PARAM_STR);
 
         $stmt->execute();
         $result = $stmt->fetch();

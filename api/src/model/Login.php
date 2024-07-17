@@ -8,7 +8,7 @@ class Login {
     private $table = 'user';
 
     public $id;
-    public $username;
+    public $email;
     public $password;
 
     public function __construct($db) {
@@ -19,11 +19,13 @@ class Login {
         return "test";
     }
     
-    public function read() {
-        $query = 'SELECT * FROM ' . $this->table . ' WHERE username = :username';
+    public function read() 
+    {
+        $query = "SELECT * FROM  $this->table WHERE email = :email";
+
         $stmt = $this->conn->prepare($query);
 
-        $stmt->bindParam(':username', $this->username, PDO::PARAM_STR);
+        $stmt->bindParam(':email', $this->email, PDO::PARAM_STR);
 
         // echo json_encode($query);
         // exit;
@@ -33,5 +35,19 @@ class Login {
         // echo json_encode($result);
         // exit;
         return $result;
+    }
+    public function emailIsVerified()
+    {
+        $query = "UPDATE $this->table SET is_verified = 1 WHERE email = :email";
+
+        $stmt = $this->conn->prepare($query);
+
+        $stmt->bindParam(':email', $this->email, PDO::PARAM_STR);
+
+        if ($stmt->execute()) {
+            return true;
+        }
+
+        return false;
     }
 }

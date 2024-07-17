@@ -8,7 +8,8 @@ use Symfony\Component\Mailer\Transport;
 
 trait Emailer{
     
-    function createEmail($to, $verification_code){
+    function createEmail($to, $verification_code): bool
+    {
 
         $transport = Transport::fromDsn('smtp://kenzorivas16@gmail.com:ozbneoistibdqvlm@smtp.gmail.com:587');
 

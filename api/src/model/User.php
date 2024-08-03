@@ -31,7 +31,6 @@ class User {
     }
 
     public function insert() {
-        // SYNTAX ERROR FOR QUERY
         $query = 'INSERT INTO ' . $this->table . '(username, password) VALUES (username = :username, password = :password)';
         $stmt = $this->conn->prepare($query);
         

@@ -12,7 +12,7 @@ class Routes{
         return self::$routes;
     }
     
-    private $routes = [
+    private static $routes = [
         'GET' => [
             // '/' => [UserController::class, 'index'],
             '/user' => [UserController::class, 'index'],

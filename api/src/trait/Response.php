@@ -25,7 +25,7 @@ trait Response{
 
     private function loginFailed(): array
     {
-        $response['status_code_header'] = 400;
+        $response['status_code_header'] = 200;
         $response['body'] = json_encode([
             'message' => 'The email address or password you entered is incorrect. Please try again.'
         ]);
@@ -34,7 +34,7 @@ trait Response{
 
     private function JWTError(): array
     {
-        $response['status_code_header'] = 400;
+        $response['status_code_header'] = 500;
         $response['body'] = json_encode([
             'error' => 'JWT failed'
         ]);
@@ -63,9 +63,9 @@ trait Response{
 
     private function usernameExist(): array
     {
-        $response['status_code_header'] = 400;
+        $response['status_code_header'] = 200;
         $response['body'] = json_encode([
-            'error' => 'Username Exist'
+            'message' => 'Username Exist'
         ]);
         return $response;
     }
@@ -81,9 +81,9 @@ trait Response{
 
     private function emailExist(): array
     {
-        $response['status_code_header'] = 400;
+        $response['status_code_header'] = 200;
         $response['body'] = json_encode([
-            'error' => 'The email address you entered is already registered. Please use a different email address or log in.'
+            'message' => 'The email address you entered is already registered. Please use a different email address or log in.'
         ]);
         return $response;
     }

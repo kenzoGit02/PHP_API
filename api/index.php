@@ -8,6 +8,7 @@ use api\src\Routes;
 
 
 header("Content-type: application/json; charset=UTF-8");
+header("Access-Control-Allow-Origin: *");
 
 set_error_handler([ErrorHandler::class, 'handleError']);
 set_exception_handler([ErrorHandler::class, 'handleException']);

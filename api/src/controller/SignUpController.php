@@ -15,6 +15,9 @@ class SignUpController
     use Validation;
     use Emailer;
 
+    /**
+     * should change how key is stored, not secured
+     */
     private $key = "CI6IkpXVCJ9";
     private $SignUp;
 
@@ -29,6 +32,9 @@ class SignUpController
         exit("exit");
     }
 
+    /**
+     * Will  hash password and send verification email and
+     */
     public function signUp(): array
     {
         $request = (array) json_decode(file_get_contents('php://input'), true);
@@ -47,7 +53,10 @@ class SignUpController
         
         $verification_code = mt_rand(100000, 999999);
         $this->SignUp->verification_code = $verification_code;
-
+        
+        /**
+         * Check if input email already exist
+         */
         if($this->SignUp->read()){
 
             return $this->emailExist();

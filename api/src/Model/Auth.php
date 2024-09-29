@@ -1,4 +1,6 @@
 <?php
+namespace App\Model;
+
 class Auth {
     private $conn;
     private $table = 'user';

@@ -1,6 +1,5 @@
 <?php
-
-namespace api\src\services;
+namespace App\Services;
 
 // require_once '../vendor/autoload.php';
 
@@ -71,4 +70,5 @@ class AuthChecker{
             
         }
     }
+    
 }

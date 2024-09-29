@@ -1,31 +1,31 @@
 <?php 
-
-// class test {
-//     private static int $number;
-//     public function __construct(private $amount)
-//     {
+namespace App\test;
+class test {
+    private static int $number;
+    public function __construct(private $amount)
+    {
         
-//     }
-//     public function __destruct()
-//     {
-//         echo "hello";
-//     }
-//     public function kek($num){
-//         $this->amount += $num;
-//         return $this;
-//     }
-//     public function getAmount()
-//     {
-//         return $this->amount;
-//     }
-//     public static function setAmount($num){
-//         self::$number = $num;
-//         return self::$number;
-//     }
-// }
-// echo "test";
-// $test = (new test(1))->kek(2)->getAmount();
-// var_dump($test);
+    }
+    public function __destruct()
+    {
+        echo "hello";
+    }
+    public function kek($num){
+        $this->amount += $num;
+        return $this;
+    }
+    public function getAmount()
+    {
+        return $this->amount;
+    }
+    public static function setAmount($num){
+        self::$number = $num;
+        return self::$number;
+    }
+}
+echo "test";
+$test = (new test(1))->kek(2)->getAmount();
+var_dump($test);
 
 
 // class testt{

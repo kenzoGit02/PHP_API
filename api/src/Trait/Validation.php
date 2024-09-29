@@ -1,15 +1,16 @@
 <?php
 
-namespace api\src\trait;
+namespace App\Trait;
 
-trait Validation{
+trait Validation
+{
 
-    public function validateInput($input): bool 
+    private function validateInput($input): bool
     {
         return isset($input['username']) && isset($input['password']);
     }
 
-    public function validateUser($input): bool 
+    private function validateUser($input): bool
     {
         return isset($input['username']) && isset($input['password']);
     }

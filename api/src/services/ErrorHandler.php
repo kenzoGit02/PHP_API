@@ -1,8 +1,9 @@
 <?php
-namespace api\src\services;
+namespace App\Services;
 
 use Throwable;
 use ErrorException;
+
 class ErrorHandler
 {
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace api\src\interface;
+namespace App\Interface;
 
 interface ResourceController {
     // public function index($request);

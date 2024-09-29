@@ -1,8 +1,7 @@
 <?php
+namespace App\Services;
 
-namespace api\src\services;
-
-require_once '../vendor/autoload.php';
+// require_once '../vendor/autoload.php';
 
 use Firebase\JWT\JWT;
 

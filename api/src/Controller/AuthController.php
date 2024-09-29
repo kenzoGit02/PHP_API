@@ -1,5 +1,7 @@
 <?php
-require_once __DIR__ . '/../model/Auth.php';
+namespace App\Controller;
+
+use App\Model\Auth;
 
 class AuthController{
     private $requestMethod;

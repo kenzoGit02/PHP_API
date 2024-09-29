@@ -1,6 +1,5 @@
 <?php
-
-namespace api\src\model;
+namespace App\Model;
 
 use PDO;
 class SignUp {

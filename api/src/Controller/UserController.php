@@ -1,16 +1,15 @@
 <?php
 
-namespace api\src\controller;
+namespace App\Controller;
 
-require_once __DIR__ . '/../model/User.php';
+// require_once __DIR__ . '/../model/User.php';
 
-use api\src\interface\ResourceController;
-use api\src\model\User;
-use api\src\services\AuthChecker;
-use api\src\trait\Response;
-use api\src\trait\Validation;
+use App\Model\User;
+use App\Services\AuthChecker;
+use App\Trait\Response;
+use App\Trait\Validation;
 
-class UserController implements ResourceController{
+class UserController{
 
     use Response;
     use Validation;

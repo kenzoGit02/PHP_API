@@ -1,5 +1,5 @@
 <?php
-namespace api\config;
+namespace App\Config;
 use PDO;
 use PDOException;
 class Database {

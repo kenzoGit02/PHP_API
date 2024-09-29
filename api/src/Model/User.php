@@ -1,5 +1,6 @@
 <?php
-namespace api\src\model;
+namespace App\Model;
+
 use PDO;
 class User {
     private PDO $conn;

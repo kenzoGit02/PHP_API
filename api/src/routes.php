@@ -1,6 +1,6 @@
 <?php
 
-namespace api\src;
+namespace App;
 
 use api\src\controller\UserController;
 use api\src\controller\LoginController;

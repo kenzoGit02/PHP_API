@@ -2,10 +2,10 @@
 
 require_once '../vendor/autoload.php';
 
-use api\src\services\ErrorHandler;
-use api\src\Router;
-use api\src\Routes;
 
+use App\Services\ErrorHandler;
+use App\Router;
+use App\Routes;
 
 header("Content-type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Origin: *");
@@ -19,7 +19,7 @@ $requestURL = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
 $response = Router::processRequest(requestMethod: $requestMethod, requestURL: $requestURL, routes: Routes::getRoutes());
 
-if(!isset($response)){
+if (!isset($response)) {
     echo 'no response';
     exit("\nreached: end of script");
 }

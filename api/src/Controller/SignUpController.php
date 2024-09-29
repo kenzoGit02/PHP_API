@@ -1,13 +1,13 @@
 <?php
 
-namespace api\src\controller;
+namespace App\Controller;
 
-require_once '../vendor/autoload.php';
+// require_once '../vendor/autoload.php';
 
-use api\src\model\SignUp;
-use api\src\trait\Emailer;
-use api\src\trait\Response;
-use api\src\trait\Validation;
+use App\Model\SignUp;
+use App\Trait\Emailer;
+use App\Trait\Response;
+use App\Trait\Validation;
 
 class SignUpController
 {

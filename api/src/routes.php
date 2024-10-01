@@ -2,9 +2,9 @@
 
 namespace App;
 
-use api\src\controller\UserController;
-use api\src\controller\LoginController;
-use api\src\controller\SignUpController;
+use App\Controller\UserController;
+use App\Controller\LoginController;
+use App\Controller\SignUpController;
 class Routes{
 
     public static function getRoutes()

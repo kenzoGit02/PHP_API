@@ -90,6 +90,10 @@ class LoginController
         return $this->verificationSuccess($token);
 
     }
+    public function checkAuth()
+    {
+        return "hello";
+    }
 
 
 }

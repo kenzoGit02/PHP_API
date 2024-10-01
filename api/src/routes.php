@@ -5,6 +5,7 @@ namespace App;
 use App\Controller\UserController;
 use App\Controller\LoginController;
 use App\Controller\SignUpController;
+use App\Controller\AuthController;
 class Routes{
 
     public static function getRoutes()
@@ -19,10 +20,10 @@ class Routes{
             '/user/{id}' => [UserController::class, 'show'],
         ],
         'POST' => [
-            '/login' => [LoginController::class, 'loginUser'],
-            '/verify_email' => [LoginController::class, 'verifyEmail'],
-            '/check_auth' => [LoginController::class, 'checkAuth'],
-            '/signup' => [SignUpController::class, 'signUp'],
+            '/login' => [AuthController::class, 'loginUser'],
+            '/verify_email' => [AuthController::class, 'verifyEmail'],
+            '/check_auth' => [AuthController::class, 'checkAuth'],
+            '/signup' => [AuthController::class, 'signUp'],
         ],
         'PUT' => [
             '/user/{id}' => [UserController::class, 'edit'],

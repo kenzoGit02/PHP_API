@@ -6,8 +6,8 @@ namespace App\Controller;
 
 use App\Model\User;
 use App\Services\AuthChecker;
-use App\Trait\Response;
-use App\Trait\Validation;
+use App\Traits\Response;
+use App\Traits\Validation;
 
 class UserController{
 

@@ -1,8 +1,11 @@
 <?php
+
 namespace App\Model;
 
 use PDO;
-class SignUp {
+
+class SignUp
+{
     private PDO $conn;
     private $table = 'user';
 
@@ -11,11 +14,13 @@ class SignUp {
     public $password;
     public $verification_code;
 
-    public function __construct($db) {
+    public function __construct($db)
+    {
         $this->conn = $db->connect();
     }
-    
-    public function testFunction() {
+
+    public function testFunction()
+    {
         return [$this->password, $this->email];
     }
 
@@ -23,7 +28,7 @@ class SignUp {
     {
         $query = 'INSERT INTO ' . $this->table . '(email, password, verification_code) VALUES (:email, :password, :verification_code)';
         $stmt = $this->conn->prepare($query);
-        
+
         $stmt->bindParam(':email', $this->email, PDO::PARAM_STR);
         $stmt->bindParam(':password', $this->password, PDO::PARAM_STR);
         $stmt->bindParam(':verification_code', $this->verification_code, PDO::PARAM_STR);
@@ -34,7 +39,8 @@ class SignUp {
 
         return false;
     }
-    public function read() {
+    public function read()
+    {
         $query = 'SELECT * FROM ' . $this->table . ' WHERE email = :email';
         $stmt = $this->conn->prepare($query);
 

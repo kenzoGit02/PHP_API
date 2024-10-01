@@ -5,7 +5,7 @@ namespace App\Services;
 
 use Firebase\JWT\JWT;
 
-class Auth
+class Token
 {
     private static $key = "CI6IkpXVCJ9";
 

@@ -35,6 +35,7 @@ class Login {
         // exit;
         return $result;
     }
+    
     public function emailIsVerified()
     {
         $query = "UPDATE $this->table SET is_verified = 1 WHERE email = :email";
